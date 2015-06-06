@@ -1,10 +1,9 @@
 
 #include <LiquidCrystal.h>
-#include "dht.h"
-#define DHT11 47
+#include "dht11.h"
+#define DHT11PIN 47
 LiquidCrystal lcd(52, 53, 32, 33, 34, 35);
-dht DHT;
-int J;
+dht11 DHT11;
 String Str[] = {"Temperaturen", "Zeit", "Lueftersteuerung", "LED Beleuchtung", "TEST", "Display"};
 String Luefter[] = {"L1","L2","L3","L4"};
 int StrArrlength = 6;
@@ -16,6 +15,8 @@ String Zeit;
 String Zeit2;
 int ZweierInt=0;
 int Luefteranzahl=4;
+String TEMPERATUR;
+String GradCelsius ="C";
 void setup() {
   attachInterrupt(2, erhoehen,RISING);
   attachInterrupt(3, enter,RISING);
@@ -42,8 +43,22 @@ void loop() {
 
     if (MenuePunkt == 0)
     {
-      String Temp = String(DHT.temperature);
-      anzeigen("TempCPU: ", Temp);
+      int chk=DHT11.read(DHT11PIN);
+      switch(chk){
+         case DHTLIB_OK: 
+		 TEMPERATUR = String(DHT11.temperature);
+                 anzeigen("TempCPU: "+ TEMPERATUR+GradCelsius,"");
+		break;
+          case DHTLIB_ERROR_CHECKSUM: 
+		anzeigen("Checksum Fehler","");
+		break;
+          case DHTLIB_ERROR_TIMEOUT: 
+		anzeigen("Timeout Fehler","");
+		break;
+            default: 
+		anzeigen("Unbekannter Fehler","Nicht verbunden?"); 
+		break;
+      }
       delay(1000);
     }
     if (MenuePunkt == 1)
@@ -71,30 +86,33 @@ void loop() {
     if (MenuePunkt == 2)
     {
          //Lueftersteuerung
-      if(ZweierInt==Luefteranzahl-1){
-          anzeigen(Luefter[ZweierInt], "");
-        }
+          if(ZweierInt==Luefteranzahl-1)
+              {
+                anzeigen(Luefter[ZweierInt], "");
+          }
    
-      else{
-        anzeigen(Luefter[ZweierInt], Luefter[ZweierInt+1]);
-        }
+                  else
+              {
+                anzeigen(Luefter[ZweierInt], Luefter[ZweierInt+1]);
+              }
     }
+    
+    
     if (MenuePunkt == 3)
     {
       //LED Beleuchtung
-      String Temp = String(DHT.temperature);
-      anzeigen("TempCPU: ", Temp);
+      anzeigen("´LED Beleuchtung","");
 
     }
     if (MenuePunkt == 4)
     {
       //TEST
-      String Temp = String(DHT.temperature);
-      anzeigen("TempCPU: ", Temp);
-      delay(1000);
-      zuruecklen();
+      anzeigen("TestMenue","TestMenue");
     }
+
     if(MenuePunkt ==5){
+      //Display
+      
       anzeigen("Kontrast    ****","Helligkeit  ****");
       
       
