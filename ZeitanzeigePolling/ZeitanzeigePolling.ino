@@ -1,4 +1,3 @@
-
 #include <LiquidCrystal.h>
 #include "dht11.h"
 #define DHT11PIN 47
@@ -8,16 +7,20 @@
 LiquidCrystal lcd(52, 53, 32, 33, 34, 35);
 dht11 DHT11;
 String Str[] = {"Temperaturen", "Zeit", "Lueftersteuerung", "LED Beleuchtung", "TEST", "Display"};
-String Luefter[] = {"L1","L2","L3","L4"};
 int StrArrlength = 6;
+String Luefter[] = {"L1","L2","L3","L4"};
+int Luefteranzahl=4;
 boolean inMenu = true;
 int MenuePunkt = 0;
 String first;
 String second;
 String Zeit;
 String Zeit2;
+String A;
+String B;
+String C;
+String D;
 int ZweierInt=0;
-int Luefteranzahl=4;
 String TEMPERATUR;
 String GradCelsius ="C";
 String FEUCHTIGKEIT;
@@ -28,6 +31,7 @@ long secs = 0;
 unsigned long lastpress1 = 0;
 unsigned long lastpress2 = 0;
 unsigned long lastpress3 = 0;
+int chk;
 void setup() {
   
   pinMode(24, INPUT);
@@ -48,54 +52,59 @@ void loop() {
   
   if(digitalRead(Buttonrunter)==HIGH){
     if(lastpress1 ==0){
-      erhoehen();
       lastpress1 = millis();
+      erhoehen();
       }
     if((millis()-lastpress1)>500){
-      erhoehen();
       lastpress1 = millis();
+      erhoehen();
       }
   }
   
    if(digitalRead(Buttonrein)==HIGH){
     if(lastpress2 ==0){
-      inMenu=false;
       lastpress2 = millis();
+      inMenu=false;
       }
     if((millis()-lastpress2)>500){
-      inMenu=false;
       lastpress2 = millis();
+      inMenu=false;
       }
   }
    if(digitalRead(Buttonraus)==HIGH){
     if(lastpress3 ==0){
-      inMenu=true;
       lastpress2 = millis();
+      inMenu=true;
       }
     if((millis()-lastpress3)>500){
-      inMenu=true;
       lastpress2 = millis();
+      inMenu=true;
       }
   }
+  
   if (inMenu) {
-    if(MenuePunkt==StrArrlength){
-      anzeigen(Str[MenuePunkt],"");
-      }
-    anzeigen(Str[MenuePunkt], Str[MenuePunkt + 1]);
-  }
-  else
+        if(MenuePunkt==StrArrlength-1){
+              anzeigen(Str[MenuePunkt],"");
+              }
+        else
+        {
+          anzeigen(Str[MenuePunkt], Str[MenuePunkt + 1]);
+                }
+        }
+  if(!inMenu)
   {
-    if(DHT11.temperature<50){
+    /*if(DHT11.temperature<50){
       //Lüfter schneller
       }
+      */
     if (MenuePunkt == 0)
     {
-      int chk=DHT11.read(DHT11PIN);
+      chk=DHT11.read(DHT11PIN);
       switch(chk){
          case DHTLIB_OK: 
 		 TEMPERATUR = String(DHT11.temperature);
                  FEUCHTIGKEIT= String(DHT11.humidity);
-                 anzeigen("TempCPU: "+ TEMPERATUR+GradCelsius,"Feucht."+FEUCHTIGKEIT);
+                 anzeigen("TempCPU: "+ TEMPERATUR+GradCelsius,"Feuchtigk. "+FEUCHTIGKEIT+"%");
 		break;
           case DHTLIB_ERROR_CHECKSUM: 
 		anzeigen("Checksum Fehler","");
@@ -107,11 +116,11 @@ void loop() {
 		anzeigen("Unbekannter Fehler","Nicht verbunden?"); 
 		break;
       }
-      delay(1000);
+      delay(300);
     }
     if (MenuePunkt == 1)
     {
-      
+      //ZEIT
       secs = millis() / 1000; 
       mins = secs / 60; 
       hours = mins / 60; 
@@ -119,12 +128,12 @@ void loop() {
       secs = secs - (mins * 60); 
       mins = mins - (hours * 60); 
       hours = hours - (days * 24);
-      String A = String(days);
-      String B = String(hours);
-      String C = String(mins);
-      String D = String(secs);
-      String Zeit = String(A + "d" + B + "h");
-      String Zeit2 = String(C + "m" + D + "s");
+       A = String(days);
+       B = String(hours);
+       C = String(mins);
+       D = String(secs);
+       Zeit = String(A + "d" + B + "h");
+       Zeit2 = String(C + "m" + D + "s");
       //Menü für Zeit
       anzeigen("Uptime:" + Zeit,Zeit2);
     }
@@ -146,7 +155,7 @@ void loop() {
     if (MenuePunkt == 3)
     {
       //LED Beleuchtung
-      anzeigen("´LED Beleuchtung","");
+      anzeigen("LED Beleuchtung","");
 
     }
     if (MenuePunkt == 4)
@@ -168,8 +177,9 @@ void loop() {
 }
 
 void erhoehen() {
+  
   if(inMenu){
-    if (MenuePunkt + 1 < StrArrlength) {
+    if (MenuePunkt+1<StrArrlength) {
           MenuePunkt++;
       }
           else {
@@ -180,10 +190,9 @@ void erhoehen() {
   if(!inMenu && MenuePunkt == 2){
     if(ZweierInt+1< Luefteranzahl){
       ZweierInt++;
-      
-    
     }
-    else{
+    else
+    {
       ZweierInt=0;
       }
 
@@ -200,7 +209,6 @@ void anzeigen(String erste, String zweite) {
     lcd.print(erste);
     lcd.setCursor(0, 1);
     lcd.print(zweite);
-    delay(50);
   }
   first = erste;
   second  = zweite;
