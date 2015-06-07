@@ -8,9 +8,10 @@ LiquidCrystal lcd(52, 53, 32, 33, 34, 35);
 dht11 DHT11;
 String Str[] = {"Temperaturen", "Zeit", "Lueftersteuerung", "LED Beleuchtung", "TEST", "Display"};
 int StrArrlength = 6;
-String Luefter[] = {"L1","L2","L3","L4"};
+String Luefter[] = {"H100i -1","H100i -2","Gehause -1","Gehause -2"};
 int Luefteranzahl=4;
 boolean inMenu = true;
+boolean inUntermenu =false;
 int MenuePunkt = 0;
 String first;
 String second;
@@ -44,11 +45,13 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.begin(16, 2);
   lcd.print("Initialisierung");
-  delay(1000);
+  delay(500);
   lcd.clear();
+  lcd.cursor();
 }
 
 void loop() {
+  lcd.setCursor(0,0);
   
   if(digitalRead(Buttonrunter)==HIGH){
     if(lastpress1 ==0){
@@ -63,22 +66,42 @@ void loop() {
   
    if(digitalRead(Buttonrein)==HIGH){
     if(lastpress2 ==0){
+      
       lastpress2 = millis();
+      if(!inMenu){
+        inUntermenu=true;
+        }
+        else{
       inMenu=false;
+      }
       }
     if((millis()-lastpress2)>500){
       lastpress2 = millis();
+      if(!inMenu){
+        inUntermenu=true;
+        }
+        else{
       inMenu=false;
-      }
+      }}
   }
    if(digitalRead(Buttonraus)==HIGH){
     if(lastpress3 ==0){
-      lastpress2 = millis();
-      inMenu=true;
+      lastpress3 = millis();
+      if(inUntermenu){
+        inUntermenu=false;
+        }
+        else{
+          inMenu=true;
+          }
       }
     if((millis()-lastpress3)>500){
-      lastpress2 = millis();
-      inMenu=true;
+      lastpress3 = millis();
+      if(inUntermenu){
+        inUntermenu=false;
+        }
+        else{
+          inMenu=true;
+          }
       }
   }
   
@@ -139,16 +162,21 @@ void loop() {
     }
     if (MenuePunkt == 2)
     {
+      if(inUntermenu==true){
+             anzeigen(Luefter[ZweierInt],"RPM");
+             }
+             else{
          //Lueftersteuerung
           if(ZweierInt==Luefteranzahl-1)
               {
                 anzeigen(Luefter[ZweierInt], "");
           }
-   
                   else
               {
                 anzeigen(Luefter[ZweierInt], Luefter[ZweierInt+1]);
               }
+              
+         }  
     }
     
     
@@ -209,6 +237,7 @@ void anzeigen(String erste, String zweite) {
     lcd.print(erste);
     lcd.setCursor(0, 1);
     lcd.print(zweite);
+    lcd.setCursor(0,0);
   }
   first = erste;
   second  = zweite;
