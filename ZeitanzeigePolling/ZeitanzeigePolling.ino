@@ -42,16 +42,14 @@ void setup() {
   pinMode(7, OUTPUT);
   analogWrite(2, 15);
   analogWrite(7, 200);
-  lcd.setCursor(0, 1);
   lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
   lcd.print("Initialisierung");
   delay(500);
   lcd.clear();
-  lcd.cursor();
 }
 
-void loop() {
-  lcd.setCursor(0,0);
+void loop() {  
   
   if(digitalRead(Buttonrunter)==HIGH){
     if(lastpress1 ==0){
@@ -155,8 +153,8 @@ void loop() {
        B = String(hours);
        C = String(mins);
        D = String(secs);
-       Zeit = String(A + "d" + B + "h");
-       Zeit2 = String(C + "m" + D + "s");
+       Zeit = String(A + "d "+ B+ "h");
+       Zeit2 = String(C + "m " + D + "s");
       //Menü für Zeit
       anzeigen("Uptime:" + Zeit,Zeit2);
     }
@@ -201,7 +199,7 @@ void loop() {
       }
      
   }
-  delay(100);
+  delay(200);
 }
 
 void erhoehen() {
@@ -237,7 +235,6 @@ void anzeigen(String erste, String zweite) {
     lcd.print(erste);
     lcd.setCursor(0, 1);
     lcd.print(zweite);
-    lcd.setCursor(0,0);
   }
   first = erste;
   second  = zweite;
