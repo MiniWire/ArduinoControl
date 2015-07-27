@@ -32,6 +32,7 @@ long secs = 0;
 unsigned long lastpress1 = 0;
 unsigned long lastpress2 = 0;
 unsigned long lastpress3 = 0;
+unsigned long timeDisplay=0;
 int chk;
 void setup() {
   
@@ -40,8 +41,8 @@ void setup() {
   pinMode(26,INPUT);
   pinMode(2, OUTPUT);
   pinMode(7, OUTPUT);
-  analogWrite(2, 15);
-  analogWrite(7, 200);
+  analogWrite(2,18); //Kontrast
+  analogWrite(7, 100); //LED
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
   lcd.print("Initialisierung");
@@ -50,13 +51,14 @@ void setup() {
 }
 
 void loop() {  
+  timeDisplay=millis();
   
   if(digitalRead(Buttonrunter)==HIGH){
     if(lastpress1 ==0){
       lastpress1 = millis();
       erhoehen();
       }
-    if((millis()-lastpress1)>500){
+    if((millis()-lastpress1)>400){
       lastpress1 = millis();
       erhoehen();
       }
@@ -73,7 +75,7 @@ void loop() {
       inMenu=false;
       }
       }
-    if((millis()-lastpress2)>500){
+    if((millis()-lastpress2)>400){
       lastpress2 = millis();
       if(!inMenu){
         inUntermenu=true;
@@ -92,7 +94,7 @@ void loop() {
           inMenu=true;
           }
       }
-    if((millis()-lastpress3)>500){
+    if((millis()-lastpress3)>400){
       lastpress3 = millis();
       if(inUntermenu){
         inUntermenu=false;
@@ -102,6 +104,14 @@ void loop() {
           }
       }
   }
+  if((millis()-timeDisplay)>10000){
+    timeDisplay=0;
+    lcd.begin(16, 2);
+    delay(100);
+    }
+    
+      
+    
   
   if (inMenu) {
         if(MenuePunkt==StrArrlength-1){
@@ -137,7 +147,7 @@ void loop() {
 		anzeigen("Unbekannter Fehler","Nicht verbunden?"); 
 		break;
       }
-      delay(300);
+      delay(400);
     }
     if (MenuePunkt == 1)
     {
@@ -199,7 +209,7 @@ void loop() {
       }
      
   }
-  delay(200);
+  delay(10);
 }
 
 void erhoehen() {
@@ -235,6 +245,7 @@ void anzeigen(String erste, String zweite) {
     lcd.print(erste);
     lcd.setCursor(0, 1);
     lcd.print(zweite);
+    delay(10);
   }
   first = erste;
   second  = zweite;
